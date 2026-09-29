@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>VAIRAL 6T9 - Viral Video Platform</title>
+  <meta name="description" content="Watch, discover, and share trending viral videos on VAIRAL 6T9.">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FF2A54">
+  <link rel="stylesheet" href="style.css">
+  <!-- Open Graph -->
+  <meta property="og:title" content="VAIRAL 6T9 - Viral Video Network">
+  <meta property="og:description" content="Discover today's most viral videos across the web.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800">
+  <meta property="og:type" content="website">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="brand-logo">
+      <div class="brand-icon">▶</div>
+      <span>VAIRAL</span>
+      <span class="brand-tag">6T9</span>
+    </div>
+    <div class="nav-actions">
+      <a href="admin.html" class="btn-admin">⚙ Admin Panel</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- SEARCH BAR -->
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search viral titles, tags, trends...">
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="category-scroll">
+      <button class="cat-chip active" data-cat="All">All</button>
+      <button class="cat-chip" data-cat="Viral">Viral</button>
+      <button class="cat-chip" data-cat="Action">Action</button>
+      <button class="cat-chip" data-cat="Music">Music</button>
+      <button class="cat-chip" data-cat="Nature">Nature</button>
+      <button class="cat-chip" data-cat="Lifestyle">Lifestyle</button>
+    </div>
+
+    <!-- ADVERTISEMENT BANNER -->
+    <div id="adBannerTop" style="margin-bottom: 1.25rem; background: #151822; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 0.8rem; color: var(--text-muted);">
+        <span style="background: #2E3244; color: #FFB703; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 6px;">AD</span>
+        Sponsored Monetization Stream
+      </div>
+      <a id="topAdLink" href="https://www.profitableratecpmnetwork.com/cv45kw4t?key=2da90e2e73d7f0ed30da1d215c04c66e" target="_blank" rel="noopener noreferrer" style="color: var(--primary); font-size: 0.8rem; font-weight: bold;">Visit Sponsor →</a>
+    </div>
+
+    <!-- VIDEOS FEED -->
+    <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem;">Trending & Latest</h2>
+    <div class="video-grid" id="videoGrid">
+      <!-- Injected via JavaScript -->
+    </div>
+  </main>
+
+  <script>
+    // Video Dataset & Storage Sync
+    const DEFAULT_VIDEOS = [
+      {
+        id: "v-6t9-01",
+        title: "VAIRAL 6T9 Premiere: The Next Era of Speed & Beat",
+        description: "Exclusive high-energy cinematic showcase featuring ultra-fast drifting, cyberpunk lights, and bass drop beats.",
+        thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        category: "Viral",
+        duration: "0:15",
+        views: 124800,
+        shares: 38400,
+        published: true
+      },
+      {
+        id: "v-6t9-02",
+        title: "Insane Freestyle Acrobatics in Neo City Center",
+        description: "Watch gravity-defying parkour stunts performed atop towering skyscraper rooftops with zero safety nets.",
+        thumbnailUrl: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&auto=format&fit=crop&q=80",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        category: "Action",
+        duration: "0:15",
+        views: 89200,
+        shares: 19400,
+        published: true
+      },
+      {
+        id: "v-6t9-03",
+        title: "Deep Space Pulse: Aurora Symphony 8K",
+        description: "Hyperlapse of cosmic solar flares dancing over the Arctic circle. Mesmerizing glowing greens and electric magentas.",
+        thumbnailUrl: "https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=800&auto=format&fit=crop&q=80",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        category: "Nature",
+        duration: "1:00",
+        views: 45100,
+        shares: 8120,
+        published: true
+      },
+      {
+        id: "v-6t9-04",
+        title: "AI Cyberpunk Soundscape Live Mixing Session",
+        description: "Analog modular synths colliding with neural network audio stems in a live neon underground warehouse.",
+        thumbnailUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+        category: "Music",
+        duration: "0:15",
+        views: 67300,
+        shares: 14200,
+        published: true
+      },
+      {
+        id: "v-6t9-05",
+        title: "Street Food Master: Flame Wok Secrets Unlocked",
+        description: "The sizzling art of master wok chefs cooking noodles in bursts of roaring dragon fire in midnight alleyways.",
+        thumbnailUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop&q=80",
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+        category: "Lifestyle",
+        duration: "0:15",
+        views: 31200,
+        shares: 6500,
+        published: true
+      }
+    ];
+
+    function getVideos() {
+      const stored = localStorage.getItem('vairal6t9_videos');
+      if (stored) {
+        try { return JSON.parse(stored); } catch(e) {}
+      }
+      localStorage.setItem('vairal6t9_videos', JSON.stringify(DEFAULT_VIDEOS));
+      return DEFAULT_VIDEOS;
+    }
+
+    let currentCategory = "All";
+    let searchQuery = "";
+
+    function renderVideos() {
+      const grid = document.getElementById('videoGrid');
+      const all = getVideos().filter(v => v.published !== false);
+
+      const filtered = all.filter(v => {
+        const matchesCat = currentCategory === "All" || v.category.toLowerCase() === currentCategory.toLowerCase();
+        const matchesQuery = !searchQuery || v.title.toLowerCase().includes(searchQuery) || (v.description && v.description.toLowerCase().includes(searchQuery));
+        return matchesCat && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">No videos found matching your search.</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(v => `
+        <div class="video-card" onclick="window.location.href='video.html?v=${v.id}'">
+          <div class="thumbnail-box">
+            <img src="${v.thumbnailUrl}" alt="${escapeHtml(v.title)}" loading="lazy">
+            <span class="badge-cat">${v.category.toUpperCase()}</span>
+            <span class="badge-duration">${v.duration || '0:30'}</span>
+          </div>
+          <div class="card-info">
+            <div style="flex: 1;">
+              <h3 class="card-title">${escapeHtml(v.title)}</h3>
+              <div class="card-meta">${formatNumber(v.views)} views • ${formatNumber(v.shares)} shares</div>
+            </div>
+            <button class="btn-share" onclick="event.stopPropagation(); shareVideo('${v.id}', '${escapeHtml(v.title)}')" title="Share Video">🔗</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function shareVideo(id, title) {
+      const url = window.location.origin + '/video.html?v=' + id;
+      if (navigator.share) {
+        navigator.share({ title: title, text: 'Watch on VAIRAL 6T9: ' + title, url: url }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(url).then(() => {
+          alert('Video link copied to clipboard: ' + url);
+        });
+      }
+    }
+
+    function formatNumber(num) {
+      if (!num) return '0';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toString();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+      });
+    }
+
+    // Category Buttons
+    document.querySelectorAll('.cat-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.getAttribute('data-cat');
+        renderVideos();
+      });
+    });
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim().toLowerCase();
+      renderVideos();
+    });
+
+    // Initial load
+    renderVideos();
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

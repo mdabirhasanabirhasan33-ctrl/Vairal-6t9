@@ -1,0 +1,27 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAdmin() {
+      return request.auth != null && 
+        (request.auth.token.role == 'admin' ||
+         firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid)));
+    }
+
+    // Video uploads: Only admins can upload MP4, WebM, MOV up to 500MB
+    match /videos/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.size < 500 * 1024 * 1024
+        && request.resource.contentType.matches('video/.*');
+    }
+
+    // Thumbnails: Only admins can upload images up to 5MB
+    match /thumbnails/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

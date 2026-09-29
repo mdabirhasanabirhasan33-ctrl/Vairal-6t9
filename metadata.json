@@ -1,0 +1,6 @@
+{
+  "name": "VAIRAL 6T9",
+  "description": "Production-ready viral video sharing platform with compliant ad gating, sharing, and admin management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

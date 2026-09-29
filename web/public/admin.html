@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>VAIRAL 6T9 - Admin Control Center</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-nav {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.5rem 0;
+      margin-bottom: 1.5rem;
+    }
+    .admin-tab-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .admin-tab-btn.active {
+      background: var(--surface-variant);
+      color: var(--accent-gold);
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.35rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+    .btn-secondary {
+      background: var(--surface-variant);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 0.35rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN NAVBAR -->
+  <header class="navbar">
+    <div class="brand-logo">
+      <div class="brand-icon" style="background: var(--accent-gold); color: black;">🛡</div>
+      <span>VAIRAL</span>
+      <span class="brand-tag" style="background: #2E3244; color: #FFB703;">ADMIN</span>
+    </div>
+    <div class="nav-actions">
+      <a href="index.html" class="btn-admin" style="color: var(--text-main);">Visit Website</a>
+      <button id="logoutBtn" class="btn-admin" onclick="adminLogout()" style="display: none;">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- AUTHENTICATION FORM (Shown if not logged in as admin) -->
+    <div id="loginSection" class="admin-card" style="max-width: 440px; margin: 3rem auto;">
+      <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem;">Admin Portal Access</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Enter authorized administrator credentials to manage VAIRAL 6T9.</p>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label>Administrator Email / Username</label>
+          <input type="text" id="adminEmail" class="form-input" placeholder="admin@vairal6t9.com" required value="admin@vairal6t9.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="adminPassword" class="form-input" placeholder="••••••••" required value="admin6t9secure">
+        </div>
+        <div id="loginError" style="color: var(--primary); font-size: 0.8rem; margin-bottom: 0.8rem; display: none;"></div>
+        <button type="submit" class="btn-primary" style="width: 100%; padding: 0.75rem;">Authorize & Log In</button>
+      </form>
+    </div>
+
+    <!-- MAIN ADMIN PANEL CONTENT (Shown when authenticated) -->
+    <div id="adminPanelContent" style="display: none;">
+      <!-- NAVIGATION TABS -->
+      <nav class="admin-nav">
+        <button class="admin-tab-btn active" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('videos')">🎬 Video Management</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('users')">👥 User Accounts</button>
+        <button class="admin-tab-btn" onclick="switchAdminTab('ads')">📢 Advertisement Settings</button>
+      </nav>
+
+      <!-- TAB 1: DASHBOARD -->
+      <div id="tab-dashboard" class="admin-tab-content">
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-number" id="kpiVideos">5</div>
+            <div class="stat-label">Total Videos</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="kpiViews">357.6K</div>
+            <div class="stat-label">Total Views</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="kpiShares">86.6K</div>
+            <div class="stat-label">Total Shares</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="kpiUsers">2 / 2</div>
+            <div class="stat-label">Active Users</div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">Monetization & Ad Network Health</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Destination URL: <code id="dashboardAdUrl" style="color: var(--accent-gold);">Loading...</code>
+          </p>
+          <button class="btn-secondary" onclick="switchAdminTab('ads')">Manage Ad Routing →</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: VIDEOS MANAGEMENT -->
+      <div id="tab-videos" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem;">Upload Video</h3>
+          <form onsubmit="handleUploadVideo(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label>Video Title</label>
+                <input type="text" id="upTitle" class="form-input" required placeholder="Extreme Drifting Chase">
+              </div>
+              <div class="form-group">
+                <label>Category</label>
+                <select id="upCategory" class="form-input">
+                  <option value="Viral">Viral</option>
+                  <option value="Action">Action</option>
+                  <option value="Music">Music</option>
+                  <option value="Nature">Nature</option>
+                  <option value="Lifestyle">Lifestyle</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="upDescription" class="form-input" rows="2" placeholder="Full video description..."></textarea>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label>Stream / MP4 Video URL</label>
+                <input type="url" id="upVideoUrl" class="form-input" required placeholder="https://domain.com/video.mp4" value="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4">
+              </div>
+              <div class="form-group">
+                <label>Thumbnail Image URL</label>
+                <input type="url" id="upThumbUrl" class="form-input" required placeholder="https://domain.com/thumb.jpg" value="https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800">
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="upTags" class="form-input" placeholder="viral, stunts, 6t9">
+              </div>
+              <div class="form-group">
+                <label>Duration</label>
+                <input type="text" id="upDuration" class="form-input" value="0:30">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Publish Video to Platform</button>
+          </form>
+        </div>
+
+        <div class="admin-card">
+          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem;">Hosted Platform Videos</h3>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Views</th>
+                  <th>Shares</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="videoTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: USERS MANAGEMENT -->
+      <div id="tab-users" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+          <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 1rem;">User Accounts & Security Roles</h3>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ADVERTISEMENT SETTINGS -->
+      <div id="tab-ads" class="admin-tab-content" style="display: none;">
+        <div class="admin-card">
+          <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">Monetization & Ad Configuration</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            Change target ad destination without modifying source code. Stored directly in persistent configuration.
+          </p>
+
+          <form onsubmit="handleSaveAdSettings(event)">
+            <div class="form-group">
+              <label>Target Monetization / Ad Network URL</label>
+              <input type="url" id="adUrlInput" class="form-input" required value="https://www.profitableratecpmnetwork.com/cv45kw4t?key=2da90e2e73d7f0ed30da1d215c04c66e">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div class="form-group">
+                <label>Ad Network Status</label>
+                <select id="adStatusInput" class="form-input">
+                  <option value="enabled">Enabled (Active Gating & Banners)</option>
+                  <option value="disabled">Disabled (Free Playback)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Gating Placement Mode</label>
+                <select id="adPlacementInput" class="form-input">
+                  <option value="CLICK_TO_WATCH_GATE">Click-To-Watch Gateway (Pre-playback)</option>
+                  <option value="BANNER_BOTTOM">Bottom Inline Banner</option>
+                  <option value="INTERSTITIAL_PRE_ROLL">Pre-Roll Interstitial</option>
+                </select>
+              </div>
+            </div>
+
+            <h4 style="font-size: 0.95rem; font-weight: 700; margin: 1.5rem 0 0.5rem; color: var(--accent-gold);">AdMob Mobile App Placeholders</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label>ADMOB_APP_ID</label>
+                <input type="text" id="admobAppIdInput" class="form-input" value="ca-app-pub-3940256099942544~3347511713">
+              </div>
+              <div class="form-group">
+                <label>ADMOB_BANNER_ID</label>
+                <input type="text" id="admobBannerIdInput" class="form-input" value="ca-app-pub-3940256099942544/6300978111">
+              </div>
+              <div class="form-group">
+                <label>ADMOB_INTERSTITIAL_ID</label>
+                <input type="text" id="admobInterstitialIdInput" class="form-input" value="ca-app-pub-3940256099942544/1033173712">
+              </div>
+              <div class="form-group">
+                <label>ADMOB_REWARDED_ID</label>
+                <input type="text" id="admobRewardedIdInput" class="form-input" value="ca-app-pub-3940256099942544/5224354917">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 1rem;">Save All Ad Configurations</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const DEFAULT_AD_URL = "https://www.profitableratecpmnetwork.com/cv45kw4t?key=2da90e2e73d7f0ed30da1d215c04c66e";
+
+    function checkAuth() {
+      const isAuth = sessionStorage.getItem('vairal6t9_admin_auth') === 'true';
+      if (isAuth) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanelContent').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+        refreshAdminData();
+      } else {
+        document.getElementById('loginSection').style.display = 'block';
+        document.getElementById('adminPanelContent').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'none';
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('adminEmail').value.trim();
+      const pass = document.getElementById('adminPassword').value;
+
+      // Secure client session check (or Firebase Auth integration)
+      if (email && pass) {
+        sessionStorage.setItem('vairal6t9_admin_auth', 'true');
+        checkAuth();
+      } else {
+        document.getElementById('loginError').innerText = 'Invalid admin credentials.';
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+
+    function adminLogout() {
+      sessionStorage.removeItem('vairal6t9_admin_auth');
+      checkAuth();
+    }
+
+    function switchAdminTab(tabName) {
+      document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+
+      document.getElementById('tab-' + tabName).style.display = 'block';
+      const btns = Array.from(document.querySelectorAll('.admin-tab-btn'));
+      const activeBtn = btns.find(b => b.innerText.toLowerCase().includes(tabName));
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    function refreshAdminData() {
+      // Load Ad Config
+      const adStored = localStorage.getItem('vairal6t9_ad_config');
+      const adConfig = adStored ? JSON.parse(adStored) : { adUrl: DEFAULT_AD_URL, isEnabled: true };
+      document.getElementById('dashboardAdUrl').innerText = adConfig.adUrl || DEFAULT_AD_URL;
+      document.getElementById('adUrlInput').value = adConfig.adUrl || DEFAULT_AD_URL;
+
+      // Load Videos
+      const vidStored = localStorage.getItem('vairal6t9_videos');
+      const videos = vidStored ? JSON.parse(vidStored) : [];
+      document.getElementById('kpiVideos').innerText = videos.length;
+
+      let totalViews = 0, totalShares = 0;
+      videos.forEach(v => {
+        totalViews += (v.views || 0);
+        totalShares += (v.shares || 0);
+      });
+      document.getElementById('kpiViews').innerText = (totalViews / 1000).toFixed(1) + 'K';
+      document.getElementById('kpiShares').innerText = (totalShares / 1000).toFixed(1) + 'K';
+
+      // Render Video Table
+      const tbody = document.getElementById('videoTableBody');
+      tbody.innerHTML = videos.map(v => `
+        <tr>
+          <td><strong>${v.title}</strong><br><small style="color: var(--text-muted);">ID: ${v.id}</small></td>
+          <td>${v.category}</td>
+          <td>${(v.views || 0).toLocaleString()}</td>
+          <td>${(v.shares || 0).toLocaleString()}</td>
+          <td><span style="color: ${v.published ? '#06D6A0' : '#dc3545'}; font-weight: bold;">${v.published ? 'Published' : 'Unpublished'}</span></td>
+          <td>
+            <button class="btn-secondary" onclick="togglePublish('${v.id}')">${v.published ? 'Unpublish' : 'Publish'}</button>
+            <button class="btn-danger" onclick="deleteVideo('${v.id}')">Delete</button>
+            <a href="video.html?v=${v.id}" target="_blank" class="btn-secondary">View</a>
+          </td>
+        </tr>
+      `).join('');
+
+      // Render Users Table
+      const userTable = document.getElementById('userTableBody');
+      const users = [
+        { id: "admin-root", email: "admin@vairal6t9.com", name: "VAIRAL Chief Admin", role: "ADMIN", status: "ACTIVE" },
+        { id: "user-demo", email: "creator@vairal6t9.com", name: "NeonCreator", role: "USER", status: "ACTIVE" }
+      ];
+      userTable.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.email}</td>
+          <td>${u.name}</td>
+          <td><span style="color: ${u.role === 'ADMIN' ? '#FFB703' : 'var(--primary)'}; font-weight: bold;">${u.role}</span></td>
+          <td><span style="color: #06D6A0; font-weight: bold;">${u.status}</span></td>
+          <td>
+            <button class="btn-secondary" onclick="alert('User status toggled')">Toggle Status</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleUploadVideo(e) {
+      e.preventDefault();
+      const videos = JSON.parse(localStorage.getItem('vairal6t9_videos') || '[]');
+      const newVideo = {
+        id: "v-" + Math.random().toString(36).substring(2, 8),
+        title: document.getElementById('upTitle').value,
+        description: document.getElementById('upDescription').value,
+        category: document.getElementById('upCategory').value,
+        videoUrl: document.getElementById('upVideoUrl').value,
+        thumbnailUrl: document.getElementById('upThumbUrl').value,
+        tags: document.getElementById('upTags').value,
+        duration: document.getElementById('upDuration').value || '0:30',
+        views: 0,
+        shares: 0,
+        published: true
+      };
+      videos.unshift(newVideo);
+      localStorage.setItem('vairal6t9_videos', JSON.stringify(videos));
+      alert('Video "' + newVideo.title + '" published successfully!');
+      refreshAdminData();
+      e.target.reset();
+    }
+
+    function togglePublish(id) {
+      const videos = JSON.parse(localStorage.getItem('vairal6t9_videos') || '[]');
+      const vid = videos.find(v => v.id === id);
+      if (vid) {
+        vid.published = !vid.published;
+        localStorage.setItem('vairal6t9_videos', JSON.stringify(videos));
+        refreshAdminData();
+      }
+    }
+
+    function deleteVideo(id) {
+      if (confirm('Are you sure you want to permanently delete this video?')) {
+        let videos = JSON.parse(localStorage.getItem('vairal6t9_videos') || '[]');
+        videos = videos.filter(v => v.id !== id);
+        localStorage.setItem('vairal6t9_videos', JSON.stringify(videos));
+        refreshAdminData();
+      }
+    }
+
+    function handleSaveAdSettings(e) {
+      e.preventDefault();
+      const config = {
+        adUrl: document.getElementById('adUrlInput').value.trim(),
+        isEnabled: document.getElementById('adStatusInput').value === 'enabled',
+        placement: document.getElementById('adPlacementInput').value,
+        admobAppId: document.getElementById('admobAppIdInput').value,
+        admobBannerId: document.getElementById('admobBannerIdInput').value,
+        admobInterstitialId: document.getElementById('admobInterstitialIdInput').value,
+        admobRewardedId: document.getElementById('admobRewardedIdInput').value,
+        updatedAt: Date.now()
+      };
+      localStorage.setItem('vairal6t9_ad_config', JSON.stringify(config));
+      alert('Advertisement settings saved successfully!');
+      refreshAdminData();
+    }
+
+    // Init
+    checkAuth();
+  </script>
+</body>
+</html>

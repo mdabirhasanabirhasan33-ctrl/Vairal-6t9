@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title id="pageTitle">VAIRAL 6T9 - Video Watch</title>
+  <meta name="description" id="pageDesc" content="Watch viral video on VAIRAL 6T9">
+  <link rel="stylesheet" href="style.css">
+  <!-- Open Graph dynamically updated -->
+  <meta property="og:title" id="ogTitle" content="VAIRAL 6T9 Video">
+  <meta property="og:description" id="ogDesc" content="Watch trending viral video on VAIRAL 6T9">
+  <meta property="og:image" id="ogImage" content="">
+  <meta property="og:type" content="video.other">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <a href="index.html" class="brand-logo">
+      <div class="brand-icon">◀</div>
+      <span>VAIRAL</span>
+      <span class="brand-tag">6T9</span>
+    </a>
+    <div class="nav-actions">
+      <a href="index.html" class="btn-admin">Feed</a>
+      <a href="admin.html" class="btn-admin">Admin</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- VIDEO PLAYER CONTAINER -->
+    <div class="player-container" id="playerContainer">
+      <!-- AD GATING OVERLAY (Compliant "CLICK TO WATCH VIDEO") -->
+      <div class="ad-gate-overlay" id="adGateOverlay">
+        <div style="background: rgba(255,42,84,0.15); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.5rem; color: var(--primary);">⚡</span>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--primary); font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Sponsored Video Access</div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0.25rem 0;">Unlock Instant Video Playback</h2>
+        <button id="clickToWatchBtn" class="btn-watch-ad" onclick="handleAdClickAndUnlock()">
+          <span>▶</span> CLICK TO WATCH VIDEO
+        </button>
+        <p style="font-size: 0.75rem; color: var(--text-muted); max-width: 320px;">
+          Compliant advertisement redirect. Direct video access will unlock automatically.
+        </p>
+      </div>
+
+      <!-- HTML5 VIDEO ELEMENT -->
+      <video id="mainVideo" controls playsinline preload="metadata">
+        <source id="videoSource" src="" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+    </div>
+
+    <!-- VIDEO INFO & DETAILS -->
+    <div style="margin-bottom: 1.5rem;">
+      <h1 id="videoTitle" style="font-size: 1.25rem; font-weight: 800; line-height: 1.35; margin-bottom: 0.5rem;">Loading Video...</h1>
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        <span id="videoStats">0 views • Published recently</span>
+        <span id="videoCategory" style="background: var(--surface-variant); color: var(--primary); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">VIRAL</span>
+      </div>
+
+      <!-- SOCIAL SHARING BUTTONS -->
+      <div class="share-bar">
+        <button class="share-btn whatsapp" onclick="shareWhatsApp()">💬 WhatsApp</button>
+        <button class="share-btn telegram" onclick="shareTelegram()">✈ Telegram</button>
+        <button class="share-btn facebook" onclick="shareFacebook()">f Facebook</button>
+        <button class="share-btn copy" onclick="copyVideoUrl()">📋 Copy Link</button>
+        <button class="share-btn" onclick="shareNative()">↗ Share More</button>
+      </div>
+
+      <!-- DESCRIPTION & TAGS BOX -->
+      <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-top: 1rem;">
+        <p id="videoDescription" style="font-size: 0.9rem; color: var(--text-main); white-space: pre-line;">Description loading...</p>
+        <div id="videoTags" style="margin-top: 0.75rem; display: flex; gap: 0.4rem; flex-wrap: wrap;"></div>
+      </div>
+    </div>
+
+    <!-- ADVERTISEMENT PLACEMENT AREA -->
+    <div class="admin-card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <div>
+        <div style="font-size: 0.7rem; color: var(--accent-gold); font-weight: bold; text-transform: uppercase;">Advertisement Sponsor</div>
+        <div style="font-size: 0.9rem; font-weight: 600;">High CPM Monitored Network Stream</div>
+      </div>
+      <a id="placementAdLink" href="https://www.profitableratecpmnetwork.com/cv45kw4t?key=2da90e2e73d7f0ed30da1d215c04c66e" target="_blank" rel="noopener noreferrer" style="background: var(--primary); color: white; padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.8rem; font-weight: bold;">Visit</a>
+    </div>
+
+    <!-- RELATED VIDEOS -->
+    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.85rem;">Up Next</h3>
+    <div class="video-grid" id="relatedGrid"></div>
+  </main>
+
+  <script>
+    const DEFAULT_AD_URL = "https://www.profitableratecpmnetwork.com/cv45kw4t?key=2da90e2e73d7f0ed30da1d215c04c66e";
+
+    function getAdConfig() {
+      const stored = localStorage.getItem('vairal6t9_ad_config');
+      if (stored) {
+        try { return JSON.parse(stored); } catch(e) {}
+      }
+      return { adUrl: DEFAULT_AD_URL, isEnabled: true };
+    }
+
+    function getVideos() {
+      const stored = localStorage.getItem('vairal6t9_videos');
+      if (stored) {
+        try { return JSON.parse(stored); } catch(e) {}
+      }
+      return [];
+    }
+
+    // Extract Video ID from ?v=id or /video/id
+    const params = new URLSearchParams(window.location.search);
+    let videoId = params.get('v') || 'v-6t9-01';
+
+    const allVideos = getVideos();
+    const currentVideo = allVideos.find(v => v.id === videoId) || allVideos[0] || {
+      id: "v-6t9-01",
+      title: "VAIRAL 6T9 Premiere: The Next Era of Speed & Beat",
+      description: "Exclusive high-energy cinematic showcase featuring ultra-fast drifting, cyberpunk lights, and bass drop beats.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      category: "Viral",
+      views: 124800,
+      shares: 38400
+    };
+
+    // Populate Page Elements
+    document.getElementById('pageTitle').innerText = currentVideo.title + " - VAIRAL 6T9";
+    document.getElementById('videoTitle').innerText = currentVideo.title;
+    document.getElementById('videoDescription').innerText = currentVideo.description || "No description provided.";
+    document.getElementById('videoCategory').innerText = (currentVideo.category || "VIRAL").toUpperCase();
+    document.getElementById('videoStats').innerText = (currentVideo.views || 0).toLocaleString() + " views • " + (currentVideo.shares || 0).toLocaleString() + " shares";
+
+    const videoSource = document.getElementById('videoSource');
+    videoSource.src = currentVideo.videoUrl;
+    document.getElementById('mainVideo').load();
+
+    // Check if Ad gating is enabled
+    const adConfig = getAdConfig();
+    const isUnlocked = sessionStorage.getItem('unlocked_' + currentVideo.id) === 'true' || !adConfig.isEnabled;
+
+    if (isUnlocked) {
+      document.getElementById('adGateOverlay').style.display = 'none';
+    }
+
+    function handleAdClickAndUnlock() {
+      const config = getAdConfig();
+      const targetUrl = config.adUrl || DEFAULT_AD_URL;
+
+      // Mark video as unlocked in this session
+      sessionStorage.setItem('unlocked_' + currentVideo.id, 'true');
+
+      // Compliantly open ad destination in new tab or popup
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+
+      // Hide gating overlay and start video
+      document.getElementById('adGateOverlay').style.display = 'none';
+      const vid = document.getElementById('mainVideo');
+      vid.play().catch(() => {});
+    }
+
+    // Sharing Handlers
+    const pageUrl = window.location.href;
+    const shareText = encodeURIComponent("Watch \"" + currentVideo.title + "\" on VAIRAL 6T9: " + pageUrl);
+
+    function shareWhatsApp() {
+      window.open("https://api.whatsapp.com/send?text=" + shareText, '_blank');
+      trackShare();
+    }
+
+    function shareTelegram() {
+      window.open("https://t.me/share/url?url=" + encodeURIComponent(pageUrl) + "&text=" + encodeURIComponent(currentVideo.title), '_blank');
+      trackShare();
+    }
+
+    function shareFacebook() {
+      window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(pageUrl), '_blank');
+      trackShare();
+    }
+
+    function copyVideoUrl() {
+      navigator.clipboard.writeText(pageUrl).then(() => {
+        alert("Video link copied to clipboard: " + pageUrl);
+        trackShare();
+      });
+    }
+
+    function shareNative() {
+      if (navigator.share) {
+        navigator.share({ title: currentVideo.title, text: currentVideo.title, url: pageUrl }).then(trackShare).catch(() => {});
+      } else {
+        copyVideoUrl();
+      }
+    }
+
+    function trackShare() {
+      currentVideo.shares = (currentVideo.shares || 0) + 1;
+      const idx = allVideos.findIndex(v => v.id === currentVideo.id);
+      if (idx !== -1) {
+        allVideos[idx] = currentVideo;
+        localStorage.setItem('vairal6t9_videos', JSON.stringify(allVideos));
+      }
+    }
+
+    // Related videos
+    const related = allVideos.filter(v => v.id !== currentVideo.id).slice(0, 4);
+    const relatedGrid = document.getElementById('relatedGrid');
+    if (related.length > 0) {
+      relatedGrid.innerHTML = related.map(v => `
+        <div class="video-card" onclick="window.location.href='video.html?v=${v.id}'">
+          <div class="thumbnail-box">
+            <img src="${v.thumbnailUrl}" alt="${v.title}">
+            <span class="badge-cat">${v.category.toUpperCase()}</span>
+            <span class="badge-duration">${v.duration || '0:30'}</span>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">${v.title}</h3>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
